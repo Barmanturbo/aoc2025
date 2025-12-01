@@ -19,7 +19,7 @@ def rotate(direction, amount):
     elif direction == "L":
         while amount > 0:
             dial -= 1
-            
+
             if dial == 0:
                 password += 1
 
@@ -27,9 +27,6 @@ def rotate(direction, amount):
                 dial = 99
 
             amount -= 1
-
-            
-# >6035; <8026
 
 
 with open("1_december/december1_input.txt") as file:
