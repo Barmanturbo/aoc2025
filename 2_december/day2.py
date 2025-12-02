@@ -96,12 +96,6 @@ def solve():
 
     return invalidIDs_local
 
-
-
-def addAllItemsInCollection(collection):
-    return sum(collection)
-
-
 if __name__ == "__main__":
     loadRanges()
     invalidIDs = solve()
@@ -110,10 +104,3 @@ if __name__ == "__main__":
     print(f"Total invalid IDs: {len(invalidIDs)}")
     print(f"Total unique invalid IDs: {len(cleaned_invalidIDs)}")
     print(f"Sum of all invalid IDs: {sum(cleaned_invalidIDs)}")
-
-
-
-
-
-
-        
