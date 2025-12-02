@@ -8,7 +8,7 @@ print(f"Lines have been loaded: {len(lines)} lines")
 beginning = []
 end = []
 
-def loadranges():
+def loadRanges():
     for line in lines:
         tokens = [t.strip() for t in line.split(',') if t.strip()]
         for token in tokens:
@@ -26,7 +26,7 @@ def loadranges():
                 else:
                     print(f"Skipping malformed token: {token}")
 
-def printbeginningend():
+def printBeginningAndEnd():
     for i in range(len(beginning)):
         print(f"range: {beginning[i]} - {end[i]}")
         print()
@@ -64,13 +64,13 @@ def hasRepeatingDigits(value):
 
 
 
-def chunk_numbers(start, end_val, chunks):
+def chunkNumbers(start, end_val, chunks):
     nums = list(range(start, end_val + 1))
     size = len(nums) // chunks or 1
     for i in range(0, len(nums), size):
         yield nums[i:i+size]
 
-def process_chunk(chunk):
+def processChunk(chunk):
     results = []
     for n in chunk:
         res = hasRepeatingDigits(n)
@@ -84,12 +84,12 @@ def solve():
     cores = cpu_count()
     tasks = []
     for start, end_val in zip(beginning, end):
-        for chunk in chunk_numbers(start, end_val, cores * 4):
+        for chunk in chunkNumbers(start, end_val, cores * 4):
             tasks.append(chunk)
 
     invalidIDs_local = []
     with Pool(cores) as pool:
-        results = pool.map(process_chunk, tasks)
+        results = pool.map(processChunk, tasks)
 
     for sublist in results:
         invalidIDs_local.extend(sublist)
@@ -103,7 +103,7 @@ def addAllItemsInCollection(collection):
 
 
 if __name__ == "__main__":
-    loadranges()
+    loadRanges()
     invalidIDs = solve()
     cleaned_invalidIDs = sorted(set(invalidIDs))
 
