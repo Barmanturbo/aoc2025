@@ -1,11 +1,12 @@
+from multiprocessing import Pool, cpu_count, Manager
+
 with open("2_december/december2_input.txt") as file:
     lines = [line.strip() for line in file.readlines()]
 
-print(f"Lines: {lines}")
+print(f"Lines have been loaded: {len(lines)} lines")
 
 beginning = []
 end = []
-invalidIDs = []
 
 def loadranges():
     for line in lines:
@@ -30,56 +31,86 @@ def printbeginningend():
         print(f"range: {beginning[i]} - {end[i]}")
         print()
 
-def hasrepeatingdigits(value):
+def findFactors(value):
+    factors = []
+    for i in range(1, value + 1):
+        if value % i == 0:
+            factors.append(i)
+
+    if factors[0] == 1 and len(factors)>2:
+        factors.pop(0)
+        factors.pop(-1)
+
+    return factors
+
+def hasRepeatingDigits(value):
     strvalue = str(value)
+    length = len(strvalue)
 
-    if len(strvalue) % 2 != 0:
-        return False
+    for chunk_size in range(1, length):
+        if length % chunk_size != 0:
+            continue
 
-    half = len(strvalue) // 2
-    for i in range(half):
-        if strvalue[i] != strvalue[i + half]:
-            return False
-        
-    invalidIDs.append(value)
-    print(f"Invalid ID found: {value}")
+        chunk = strvalue[:chunk_size]
+        inv = length // chunk_size
 
-    return True
+        if inv == 1:  # skip trivial full-length matches
+            continue
+
+        if chunk * inv == strvalue:
+            return value  # return invalid ID
+
+    return None  # valid number
+
+
+
+def chunk_numbers(start, end_val, chunks):
+    nums = list(range(start, end_val + 1))
+    size = len(nums) // chunks or 1
+    for i in range(0, len(nums), size):
+        yield nums[i:i+size]
+
+def process_chunk(chunk):
+    results = []
+    for n in chunk:
+        res = hasRepeatingDigits(n)
+        if res is not None:
+            results.append(res)
+    return results
+
+
 
 def solve():
-    for i in range(len(beginning)):
-        while beginning[i] <= end[i]:
-            hasrepeatingdigits(beginning[i])
-            beginning[i] += 1
+    cores = cpu_count()
+    tasks = []
+    for start, end_val in zip(beginning, end):
+        for chunk in chunk_numbers(start, end_val, cores * 4):
+            tasks.append(chunk)
 
-def removeDuplicates(list):
-    seen = set()
-    result = []
-    for item in list:
-        if item not in seen:
-            seen.add(item)
-            result.append(item)
-    return result
+    invalidIDs_local = []
+    with Pool(cores) as pool:
+        results = pool.map(process_chunk, tasks)
+
+    for sublist in results:
+        invalidIDs_local.extend(sublist)
+
+    return invalidIDs_local
+
+
 
 def addAllItemsInCollection(collection):
-    total = 0
-    for item in collection:
-        total += item
-    return total
+    return sum(collection)
 
 
-loadranges()
-printbeginningend()
-solve()
+if __name__ == "__main__":
+    loadranges()
+    invalidIDs = solve()
+    cleaned_invalidIDs = sorted(set(invalidIDs))
 
-cleaned_invalidIDs = removeDuplicates(invalidIDs)
+    print(f"Total invalid IDs: {len(invalidIDs)}")
+    print(f"Total unique invalid IDs: {len(cleaned_invalidIDs)}")
+    print(f"Sum of all invalid IDs: {sum(cleaned_invalidIDs)}")
 
-print(invalidIDs)
-
-print(f"Total invalid IDs: {len(invalidIDs)}")
-print(f"Total unique invalid IDs: {len(cleaned_invalidIDs)}")
-
-print(f"Sum of all invalid IDs: {addAllItemsInCollection(cleaned_invalidIDs)}")
 
 
 
