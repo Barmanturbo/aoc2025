@@ -62,8 +62,6 @@ def hasRepeatingDigits(value):
 
     return None  # valid number
 
-
-
 def chunkNumbers(start, end_val, chunks):
     nums = list(range(start, end_val + 1))
     size = len(nums) // chunks or 1
@@ -77,8 +75,6 @@ def processChunk(chunk):
         if res is not None:
             results.append(res)
     return results
-
-
 
 def solve():
     cores = cpu_count()
