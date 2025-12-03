@@ -2,15 +2,24 @@
 
 def findHighestJoltage(bank):
     digits = [int(d) for d in bank]
+    keep_count = 12
+    remove_count = len(digits) - keep_count
     
-    # just bruteforce all combinations of two digits; the input file isn't that large
-    max_result = 0
-    for battery1 in range(len(digits)):
-        for battery2 in range(battery1+1, len(digits)):
-            result = digits[battery1] * 10 + digits[battery2]
-            max_result = max(max_result, result)
+    # Use monotonic stack: remove smaller digits when we see larger ones
+    stack = []
+    for d in digits:
+        # Remove smaller digits from stack if we have removals left
+        while stack and stack[-1] < d and remove_count > 0:
+            stack.pop()
+            remove_count -= 1
+        stack.append(d)
     
-    return max_result
+    # If we still have removals left, remove from the end
+    while remove_count > 0:
+        stack.pop()
+        remove_count -= 1
+    
+    return int(''.join(map(str, stack[:keep_count])))
     
     
 if __name__ == "__main__":
